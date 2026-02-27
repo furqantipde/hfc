@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HFC | Hot Fried Chicken - Ultimate Crunch</title>
+    <meta name="description" content="Order the crunchiest, juiciest fried chicken and loaded burgers in Lahore.">
+    
+    <style>
+        /* =========================================
+           1. CORE VARIABLES & THEME (HFC BRANDING)
+           ========================================= */
+        :root {
+            --bg-main: #0a0a0a;
+            --bg-card: #141414;
+            --bg-elevated: #1e1e1e;
+            --hfc-red: #e60000;
+            --hfc-red-hover: #ff1a1a;
+            --hfc-red-glow: rgba(230, 0, 0, 0.4);
+            --hfc-yellow: #ffb800;
+            --text-main: #ffffff;
+            --text-muted: #a3a3a3;
+            
+            --font-ui: 'Segoe UI', system-ui, sans-serif;
+            --font-loud: 'Impact', 'Arial Black', sans-serif;
+            
+            --transition-snap: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition-smooth: all 0.4s ease-out;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-ui); background: var(--bg-main); color: var(--text-main); line-height: 1.5; overflow-x: hidden; }
+        img { max-width: 100%; height: auto; display: block; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: var(--hfc-red); border-radius: 4px; }
+
+        /* =========================================
+           2. ANIMATIONS
+           ========================================= */
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 70% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 15px var(--hfc-red-glow); } 50% { box-shadow: 0 0 30px var(--hfc-red-glow), 0 0 10px var(--hfc-red); } }
+
+        .anim-slide-up { animation: slideUpFade 0.8s ease forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+
+        /* =========================================
+           3. TYPOGRAPHY & BUTTONS
+           ========================================= */
+        h1, h2, h3 { font-family: var(--font-loud); text-transform: uppercase; letter-spacing: 1px; }
+        .title-primary { font-size: clamp(3rem, 8vw, 6rem); line-height: 0.9; margin-bottom: 1rem; color: var(--text-main); }
+        .title-primary span { color: var(--hfc-red); text-shadow: 3px 3px 0px rgba(255,255,255,0.1); }
+        .section-title { font-size: 3rem; text-align: center; margin-bottom: 3rem; }
+        .section-title span { color: var(--hfc-yellow); }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 1rem 2.5rem; font-family: var(--font-loud); font-size: 1.2rem;
+            text-transform: uppercase; border-radius: 4px; transition: var(--transition-snap);
+            letter-spacing: 1px; transform: skewX(-5deg); position: relative;
+        }
+        .btn-inner { transform: skewX(5deg); display: block; } /* un-skew text */
+        .btn-red { background: var(--hfc-red); color: white; box-shadow: 4px 4px 0px var(--hfc-yellow); }
+        .btn-red:hover { background: var(--hfc-red-hover); transform: skewX(-5deg) translateY(-4px); box-shadow: 4px 8px 0px var(--hfc-yellow); }
+        .btn-outline { border: 3px solid var(--hfc-yellow); color: var(--hfc-yellow); }
+        .btn-outline:hover { background: var(--hfc-yellow); color: var(--bg-main); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* =========================================
+           4. HEADER
+           ========================================= */
+        header { position: fixed; width: 100%; top: 0; z-index: 1000; padding: 1.5rem 0; transition: var(--transition-smooth); }
+        header.scrolled { background: rgba(10, 10, 10, 0.95); padding: 1rem 0; border-bottom: 2px solid var(--hfc-red); backdrop-filter: blur(10px); }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: var(--font-loud); font-size: 2.5rem; color: var(--hfc-red); text-decoration: none; text-shadow: 2px 2px 0px var(--text-main); }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-main); font-weight: bold; text-transform: uppercase; text-decoration: none; transition: 0.3s; }
+        .nav-links a:hover { color: var(--hfc-yellow); }
+
+        /* =========================================
+           5. HERO SECTION
+           ========================================= */
+        .hero {
+            height: 100vh; display: flex; align-items: center; position: relative;
+            background: radial-gradient(circle at 70% 50%, #2a0000 0%, var(--bg-main) 70%);
+            overflow: hidden; padding-top: 80px;
+        }
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 2rem; }
+        .hero-text p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 2rem; max-width: 450px; }
+        .hero-visual { position: relative; }
+        .hero-visual img { width: 130%; max-width: 800px; transform: scale(1.1) translateX(-5%); filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8)); animation: popIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .badge-spicy {
+            position: absolute; top: 10%; right: 10%; background: var(--hfc-yellow); color: var(--bg-main);
+            font-family: var(--font-loud); padding: 1rem; border-radius: 50%; width: 100px; height: 100px;
+            display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.1;
+            transform: rotate(15deg); box-shadow: 0 10px 20px rgba(0,0,0,0.5); animation: pulseGlow 2s infinite;
+        }
+
+        /* =========================================
+           6. MENU SECTION
+           ========================================= */
+        section { padding: 6rem 0; }
+        .menu-nav { display: flex; justify-content: center; gap: 1rem; margin-bottom: 3rem; flex-wrap: wrap; }
+        .menu-tab { padding: 0.8rem 2rem; font-family: var(--font-loud); font-size: 1.1rem; color: var(--text-main); background: var(--bg-elevated); border: 2px solid transparent; transform: skewX(-10deg); transition: 0.3s; }
+        .menu-tab span { display: block; transform: skewX(10deg); }
+        .menu-tab.active, .menu-tab:hover { background: var(--hfc-red); border-color: var(--hfc-red); }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
+        .menu-card {
+            background: var(--bg-card); border: 2px solid var(--bg-elevated); border-radius: 8px;
+            overflow: hidden; transition: var(--transition-snap); display: flex; flex-direction: column;
+        }
+        .menu-card:hover { border-color: var(--hfc-red); transform: translateY(-10px); box-shadow: 0 15px 30px rgba(230,0,0,0.15); }
+        .menu-img { height: 250px; overflow: hidden; position: relative; background: #111; }
+        .menu-img img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .menu-card:hover .menu-img img { transform: scale(1.1); }
+        .menu-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .menu-content h3 { font-size: 1.6rem; margin-bottom: 0.5rem; color: var(--hfc-yellow); }
+        .menu-content p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; flex-grow: 1; }
+        .menu-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--bg-elevated); padding-top: 1rem; }
+        .price { font-family: var(--font-loud); font-size: 1.5rem; }
+
+        /* =========================================
+           7. CUSTOMIZER MODAL (SPICE & EXTRAS)
+           ========================================= */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; opacity: 0; visibility: hidden; transition: 0.3s; display: flex; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(5px); }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); width: 100%; max-width: 500px; border: 2px solid var(--hfc-red); border-radius: 8px; transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--bg-elevated); display: flex; justify-content: space-between; align-items: center; background: var(--hfc-red); color: white; }
+        .modal-header h2 { font-size: 1.8rem; margin: 0; }
+        .close-btn { color: white; font-size: 2rem; font-weight: bold; line-height: 1; }
+        
+        .modal-body { padding: 1.5rem; overflow-y: auto; }
+        .option-group { margin-bottom: 2rem; }
+        .option-title { font-family: var(--font-loud); font-size: 1.2rem; color: var(--hfc-yellow); margin-bottom: 1rem; text-transform: uppercase; }
+        
+        .radio-btn { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 2px solid var(--bg-elevated); border-radius: 4px; margin-bottom: 0.5rem; cursor: pointer; transition: 0.2s; font-weight: bold; }
+        .radio-btn.selected { border-color: var(--hfc-red); background: rgba(230,0,0,0.1); }
+        .radio-btn input { display: none; }
+        
+        .checkbox-btn { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 2px solid var(--bg-elevated); border-radius: 4px; margin-bottom: 0.5rem; cursor: pointer; transition: 0.2s; }
+        .checkbox-btn:hover { border-color: var(--hfc-yellow); }
+        .checkbox-btn input { accent-color: var(--hfc-red); width: 20px; height: 20px; }
+        
+        .modal-footer { padding: 1.5rem; border-top: 1px solid var(--bg-elevated); display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); }
+        .modal-price { font-family: var(--font-loud); font-size: 2rem; color: var(--text-main); }
+
+        /* =========================================
+           8. SLIDE-OUT CART
+           ========================================= */
+        .cart-trigger { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: var(--hfc-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; z-index: 1500; box-shadow: 0 10px 20px rgba(255,184,0,0.4); transition: 0.3s; border: 4px solid var(--bg-main); }
+        .cart-trigger:hover { transform: scale(1.1); }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: var(--hfc-red); color: white; font-family: var(--font-loud); width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+
+        .cart-sidebar { position: fixed; top: 0; right: -100%; width: 100%; max-width: 400px; height: 100vh; background: var(--bg-main); z-index: 2001; transition: 0.4s ease-in-out; display: flex; flex-direction: column; border-left: 2px solid var(--hfc-red); }
+        .cart-sidebar.active { right: 0; }
+        .cart-header { padding: 1.5rem; background: var(--hfc-red); color: white; display: flex; justify-content: space-between; align-items: center; }
+        .cart-items { flex-grow: 1; overflow-y: auto; padding: 1.5rem; }
+        
+        .cart-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--bg-elevated); }
+        .cart-item-info { flex-grow: 1; }
+        .cart-item-title { font-family: var(--font-loud); font-size: 1.2rem; color: var(--hfc-yellow); line-height: 1.1; margin-bottom: 5px; }
+        .cart-item-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+        .cart-controls { display: flex; align-items: center; gap: 10px; }
+        .qty-btn { background: var(--bg-elevated); color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 4px; }
+        .qty-btn:hover { background: var(--hfc-red); }
+
+        .cart-footer { padding: 1.5rem; background: var(--bg-card); border-top: 2px solid var(--hfc-red); }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
+        .total-row { font-family: var(--font-loud); font-size: 1.8rem; color: var(--hfc-yellow); display: flex; justify-content: space-between; margin: 15px 0; border-top: 1px dashed var(--text-muted); padding-top: 15px; }
+        
+        /* Checkout Form */
+        .form-input { width: 100%; padding: 12px; background: var(--bg-elevated); border: 1px solid #333; color: white; margin-bottom: 15px; border-radius: 4px; font-family: var(--font-ui); }
+        .form-input:focus { outline: none; border-color: var(--hfc-yellow); }
+
+        @media (max-width: 768px) {
+            .hero-grid { grid-template-columns: 1fr; text-align: center; }
+            .hero-text p { margin: 0 auto 2rem; }
+            .badge-spicy { right: 0; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <div class="container nav-wrapper">
+            <a href="#" class="logo">HFC.</a>
+            <nav class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#menu">Menu</a>
+                <a href="#deals">Deals</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container hero-grid">
+                <div class="hero-text anim-slide-up">
+                    <h1 class="title-primary">ULTIMATE<br><span>CRUNCH.</span></h1>
+                    <p>Lahore's most ruthless fried chicken. Hand-breaded, pressure-fried, and packed with our signature 11-spice heat.</p>
+                    <button class="btn btn-red" onclick="document.getElementById('menu').scrollIntoView();">
+                        <span class="btn-inner">Order Now</span>
+                    </button>
+                </div>
+                <div class="hero-visual anim-slide-up delay-1">
+                    <img src="https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80" alt="Crispy Chicken Burger">
+                    <div class="badge-spicy">100%<br>HALAL</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="menu">
+            <div class="container">
+                <h2 class="section-title anim-slide-up">EXPLORE THE <span>MENU</span></h2>
+                
+                <div class="menu-nav anim-slide-up delay-1">
+                    <button class="menu-tab active" data-cat="all"><span>All Items</span></button>
+                    <button class="menu-tab" data-cat="burger"><span>Zingers & Burgers</span></button>
+                    <button class="menu-tab" data-cat="chicken"><span>Fried Chicken</span></button>
+                    <button class="menu-tab" data-cat="sides"><span>Loaded Fries</span></button>
+                </div>
+
+                <div class="menu-grid" id="menu-grid">
+                    </div>
+            </div>
+        </section>
+    </main>
+
+    <button class="cart-trigger" id="cart-trigger">
+        🛒<span class="cart-badge" id="cart-badge">0</span>
+    </button>
+
+    <div class="modal-overlay" id="customizer-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="cust-title">Item Name</h2>
+                <button class="close-btn" id="close-customizer">×</button>
+            </div>
+            
+            <div class="modal-body">
+                <p id="cust-desc" style="color:var(--text-muted); margin-bottom: 1.5rem;">Description</p>
+                
+                <div class="option-group" id="spice-group">
+                    <div class="option-title">Spice Level</div>
+                    <label class="radio-btn selected" onclick="selectRadio(this, 'spice')">
+                        <span>Original Classic</span>
+                        <input type="radio" name="spice" value="Original" checked>
+                    </label>
+                    <label class="radio-btn" onclick="selectRadio(this, 'spice')">
+                        <span>🌶️ Flamin' Hot Spicy</span>
+                        <input type="radio" name="spice" value="Spicy">
+                    </label>
+                </div>
+
+                <div class="option-group">
+                    <div class="option-title">Pimp Your Order (Extras)</div>
+                    <label class="checkbox-btn">
+                        <span>Melted Cheddar Cheese (+Rs. 100)</span>
+                        <input type="checkbox" class="addon-cb" value="100" data-name="Extra Cheese" onchange="calcCustPrice()">
+                    </label>
+                    <label class="checkbox-btn">
+                        <span>Jalapeno Coins (+Rs. 80)</span>
+                        <input type="checkbox" class="addon-cb" value="80" data-name="Jalapenos" onchange="calcCustPrice()">
+                    </label>
+                    <label class="checkbox-btn" id="double-patty-container">
+                        <span>Make it Double Patty (+Rs. 350)</span>
+                        <input type="checkbox" class="addon-cb" value="350" data-name="Double Patty" onchange="calcCustPrice()">
+                    </label>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="modal-price" id="cust-price">Rs. 0</div>
+                <button class="btn btn-red" id="btn-add-custom">
+                    <span class="btn-inner">Add to Cart</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cart-overlay"></div>
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h2>YOUR TRAY</h2>
+            <button id="close-sidebar" class="close-btn">×</button>
+        </div>
+        
+        <div class="cart-items" id="cart-items-container"></div>
+
+        <div class="cart-footer">
+            <div id="summary-view">
+                <div class="summary-row"><span>Subtotal</span><span id="summary-subtotal">Rs. 0</span></div>
+                <div class="summary-row" style="color:var(--text-muted)"><span>Delivery</span><span>Rs. 100</span></div>
+                <div class="total-row"><span>TOTAL</span><span id="summary-total">Rs. 0</span></div>
+                <button class="btn btn-red" style="width:100%" onclick="toggleCheckout(true)">
+                    <span class="btn-inner">Checkout</span>
+                </button>
+            </div>
+
+            <form id="checkout-form" style="display:none;">
+                <h3 style="color:var(--hfc-yellow); margin-bottom: 15px;">DELIVERY DETAILS</h3>
+                <input type="text" id="wa-name" class="form-input" placeholder="Name" required>
+                <input type="tel" id="wa-phone" class="form-input" placeholder="Phone (03XX-XXXXXXX)" pattern="^03[0-9]{9}$" required>
+                <textarea id="wa-address" class="form-input" placeholder="Address (Lahore only)" rows="2" required></textarea>
+                
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn btn-outline" style="flex:1" onclick="toggleCheckout(false)"><span class="btn-inner">Back</span></button>
+                    <button type="submit" class="btn btn-red" style="flex:2; background:#00b300; box-shadow:none;"><span class="btn-inner">Send Order</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const menuData = [
+            { id: 1, name: "The Grand Zinger", desc: "Huge crispy breast fillet, iceberg lettuce, signature mayo.", price: 650, cat: "burger", img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=500&q=80", type: "burger" },
+            { id: 2, name: "HFC Mighty Tower", desc: "Double crispy fillet, cheese slice, hashbrown, spicy sauce.", price: 950, cat: "burger", img: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=500&q=80", type: "burger" },
+            { id: 3, name: "3-Pc Crispy Fried", desc: "Three pieces of our signature bone-in fried chicken.", price: 750, cat: "chicken", img: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?auto=format&fit=crop&w=500&q=80", type: "chicken" },
+            { id: 4, name: "Dynamite Loaded Fries", desc: "Crispy fries topped with chopped zinger, cheese sauce, and jalapenos.", price: 550, cat: "sides", img: "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=500&q=80", type: "side" },
+            { id: 5, name: "HFC Family Bucket", desc: "10 Pcs Fried Chicken, 2 Large Fries, 4 Buns, 1.5L Drink.", price: 2800, cat: "chicken", img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=80", type: "chicken" }
+        ];
+
+        let cart = [];
+        let activeItem = null;
+        let basePrice = 0;
+        const DELIVERY = 100;
+        const HFC_PHONE = "923001234567";
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderMenu('all');
+            window.addEventListener('scroll', () => {
+                document.getElementById('header').classList.toggle('scrolled', window.scrollY > 50);
+            });
+        });
+
+        // --- RENDER MENU ---
+        function renderMenu(filter) {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+            const data = filter === 'all' ? menuData : menuData.filter(i => i.cat === filter);
+            
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'menu-card anim-slide-up';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.innerHTML = `
+                    <div class="menu-img"><img src="${item.img}" alt="${item.name}" loading="lazy"></div>
+                    <div class="menu-content">
+                        <h3>${item.name}</h3>
+                        <p>${item.desc}</p>
+                        <div class="menu-footer">
+                            <span class="price">Rs. ${item.price}</span>
+                            <button class="btn btn-outline" style="padding: 0.5rem 1.5rem; font-size: 1rem;" onclick="openModal(${item.id})">
+                                <span class="btn-inner">+ ADD</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.querySelectorAll('.menu-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+                const target = e.target.closest('.menu-tab');
+                target.classList.add('active');
+                renderMenu(target.dataset.cat);
+            });
+        });
+
+        // --- MODAL LOGIC ---
+        function openModal(id) {
+            activeItem = menuData.find(i => i.id === id);
+            basePrice = activeItem.price;
+            
+            document.getElementById('cust-title').innerText = activeItem.name;
+            document.getElementById('cust-desc').innerText = activeItem.desc;
+            
+            // UI Resets
+            document.querySelectorAll('.radio-btn').forEach(r => r.classList.remove('selected'));
+            document.querySelector('input[name="spice"][value="Original"]').checked = true;
+            document.querySelector('input[name="spice"][value="Original"]').parentElement.classList.add('selected');
+            document.querySelectorAll('.addon-cb').forEach(cb => cb.checked = false);
+
+            // Hide Double Patty if not a burger
+            document.getElementById('double-patty-container').style.display = activeItem.type === 'burger' ? 'flex' : 'none';
+            // Hide Spice Level if it's just sides
+            document.getElementById('spice-group').style.display = activeItem.type === 'side' ? 'none' : 'block';
+
+            calcCustPrice();
+            document.getElementById('customizer-modal').classList.add('active');
+        }
+
+        document.getElementById('close-customizer').addEventListener('click', () => {
+            document.getElementById('customizer-modal').classList.remove('active');
+        });
+
+        window.selectRadio = function(el, group) {
+            document.querySelectorAll(`input[name="${group}"]`).forEach(i => i.parentElement.classList.remove('selected'));
+            el.classList.add('selected');
+            el.querySelector('input').checked = true;
+        }
+
+        window.calcCustPrice = function() {
+            let total = basePrice;
+            document.querySelectorAll('.addon-cb:checked').forEach(cb => total += parseInt(cb.value));
+            document.getElementById('cust-price').innerText = `Rs. ${total}`;
+            return total;
+        }
+
+        // --- CART LOGIC ---
+        document.getElementById('btn-add-custom').addEventListener('click', () => {
+            const finalPrice = calcCustPrice();
+            
+            let spiceLevel = "";
+            if(activeItem.type !== 'side') spiceLevel = document.querySelector('input[name="spice"]:checked').value;
+            
+            let addons = [];
+            document.querySelectorAll('.addon-cb:checked').forEach(cb => addons.push(cb.dataset.name));
+            
+            let metaDesc = spiceLevel ? `[${spiceLevel}] ` : '';
+            if(addons.length) metaDesc += `+ ${addons.join(', ')}`;
+            if(!metaDesc) metaDesc = "Standard Recipe";
+
+            const cartId = `${activeItem.id}-${spiceLevel}-${addons.join('-')}`;
+            const existing = cart.find(i => i.cartId === cartId);
+            
+            if(existing) existing.qty++;
+            else cart.push({ cartId, name: activeItem.name, price: finalPrice, meta: metaDesc, qty: 1 });
+
+            document.getElementById('customizer-modal').classList.remove('active');
+            updateCart();
+            
+            // Pop floating cart
+            const btn = document.getElementById('cart-trigger');
+            btn.style.transform = 'scale(1.3)'; setTimeout(() => btn.style.transform = '', 200);
+        });
+
+        function updateCart() {
+            const container = document.getElementById('cart-items-container');
+            let subtotal = 0, count = 0;
+            container.innerHTML = '';
+
+            if(cart.length === 0) {
+                container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Your tray is empty.</p>';
+                document.getElementById('summary-view').style.opacity = '0.5';
+                document.getElementById('summary-view').style.pointerEvents = 'none';
+            } else {
+                document.getElementById('summary-view').style.opacity = '1';
+                document.getElementById('summary-view').style.pointerEvents = 'all';
+                
+                cart.forEach((item, index) => {
+                    subtotal += item.price * item.qty;
+                    count += item.qty;
+                    container.innerHTML += `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <div class="cart-item-title">${item.name}</div>
+                                <div class="cart-item-meta">${item.meta}</div>
+                                <div style="color:var(--hfc-red); font-family:var(--font-loud); font-size:1.1rem;">Rs. ${item.price * item.qty}</div>
+                            </div>
+                            <div class="cart-controls">
+                                <button class="qty-btn" onclick="modQty(${index}, -1)">-</button>
+                                <span style="font-weight:bold; width:15px; text-align:center;">${item.qty}</span>
+                                <button class="qty-btn" onclick="modQty(${index}, 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('cart-badge').innerText = count;
+            document.getElementById('summary-subtotal').innerText = `Rs. ${subtotal}`;
+            document.getElementById('summary-total').innerText = `Rs. ${subtotal > 0 ? subtotal + DELIVERY : 0}`;
+        }
+
+        window.modQty = function(i, diff) {
+            cart[i].qty += diff;
+            if(cart[i].qty <= 0) cart.splice(i, 1);
+            updateCart();
+        }
+
+        // Sidebar Toggles
+        const sidebar = document.getElementById('cart-sidebar');
+        const overlay = document.getElementById('cart-overlay');
+        document.getElementById('cart-trigger').addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
+        const closeSidebar = () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); toggleCheckout(false); };
+        document.getElementById('close-sidebar').addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // Checkout & WhatsApp
+        window.toggleCheckout = function(show) {
+            document.getElementById('summary-view').style.display = show ? 'none' : 'block';
+            document.getElementById('cart-items-container').style.display = show ? 'none' : 'block';
+            document.getElementById('checkout-form').style.display = show ? 'block' : 'none';
+        }
+
+        document.getElementById('checkout-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const n = document.getElementById('wa-name').value;
+            const p = document.getElementById('wa-phone').value;
+            const a = document.getElementById('wa-address').value;
+            
+            let msg = `*🔥 HFC ORDER CONFIRMATION*%0A%0A*Name:* ${n}%0A*Phone:* ${p}%0A*Address:* ${a}%0A%0A*Items:*%0A`;
+            let sub = 0;
+            cart.forEach(i => { sub += i.price * i.qty; msg += `▪️ ${i.qty}x ${i.name} (Rs. ${i.price * i.qty})%0A   _${i.meta}_%0A`; });
+            
+            msg += `%0A*Subtotal:* Rs. ${sub}%0A*Delivery:* Rs. ${DELIVERY}%0A*Total:* *Rs. ${sub + DELIVERY}*%0A(Cash on Delivery)`;
+            
+            window.open(`https://wa.me/${HFC_PHONE}?text=${msg}`, '_blank');
+            cart = []; updateCart(); closeSidebar(); e.target.reset();
+        });
+    </script>
+</body>
+</html>
